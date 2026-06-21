@@ -142,10 +142,16 @@
       section.classList.toggle('hidden', type !== '各自輸入特定金額/比例');
     }
 
+    // 1. 大師修正：打開網頁時跨網域向 GAS 索取最新看板資訊
     window.onload = function() {
-      google.script.run.withSuccessHandler(function(res) {
-        document.getElementById('summaryBox').innerText = res;
-      }).getLiveSummary();
+      fetch("https://script.google.com/macros/s/AKfycbzll0eEhUyEjy1VvnrD3rt1-4pZve_kN0_8le5GEwBwu_igSqktmbv006SM5lOJdtlq/exec")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('summaryBox').innerText = data.summary;
+        })
+        .catch(err => {
+          document.getElementById('summaryBox').innerText = "📊 暫時無法獲取即時對帳資訊";
+        });
     }
 
     function submitForm() {
@@ -171,7 +177,6 @@
         fileData: null, fileName: null, fileMimeType: null
       };
 
-      // 如果有選擇照片，轉成 Base64 碼後上傳
       if (fileInput) {
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -186,8 +191,14 @@
       }
     }
 
+    // 2. 大師修正：按下送出按鈕時跨網域將資料傳回 GAS 試算表
     function sendToServer(formData) {
-      google.script.run.withSuccessHandler(function(result) {
+      fetch("https://script.google.com/macros/s/AKfycbzll0eEhUyEjy1VvnrD3rt1-4pZve_kN0_8le5GEwBwu_igSqktmbv006SM5lOJdtlq/exec", {
+        method: "POST",
+        body: JSON.stringify(formData)
+      })
+      .then(res => res.json())
+      .then(result => {
         const subBtn = document.getElementById('subBtn');
         subBtn.disabled = false;
         if(result.success) {
@@ -202,7 +213,13 @@
           alert("❌ 錯誤：" + result.error); 
           document.getElementById('summaryBox').innerText = "❌ 寫入失敗";
         }
-      }).submitExpense(formData);
+      })
+      .catch(err => {
+        const subBtn = document.getElementById('subBtn');
+        subBtn.disabled = false;
+        alert("❌ 連線失敗：" + err);
+        document.getElementById('summaryBox').innerText = "❌ 連線失敗";
+      });
     }
   </script>
 </body>
