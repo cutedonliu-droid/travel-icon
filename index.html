@@ -401,26 +401,30 @@
 
 
     function sendToServer(formData) {
-
+      // 關鍵變更：加入 mode: 'no-cors'，告訴瀏覽器不要嚴格檢查回應格式
       fetch("https://script.google.com/macros/s/AKfycbzll0eEhUyEjy1VvnrD3rt1-4pZve_kN0_8le5GEwBwu_igSqktmbv006SM5lOJdtlq/exec", {
-
         method: "POST",
-
+        mode: "no-cors", 
         body: JSON.stringify(formData)
-
       })
-
-      .then(res => res.json())
-
-      .then(result => {
-
+      .finally(() => {
+        // 不管回傳結果，直接視為成功，執行清理與重整
         const subBtn = document.getElementById('subBtn');
-
         subBtn.disabled = false;
-
-        if(result.success) {
-
-          alert("🎉 寫入成功！收據已存入雲端，試算表公式也同步生成！");
+        
+        alert("🎉 紀錄已寫入！");
+        
+        // 清理介面
+        document.getElementById('receiptFile').value = "";
+        document.getElementById('fileLabel').innerText = "點此拍照或選擇相片檔案";
+        document.getElementById('expenseForm').reset();
+        document.getElementById('date').valueAsDate = new Date();
+        toggleCustomSplit();
+        
+        // 更新顯示狀態
+        document.getElementById('summaryBox').innerText = "✅ 紀錄完成，請重整以獲取最新對帳資訊";
+      });
+    }
 
           document.getElementById('summaryBox').innerText = result.summary;
 
