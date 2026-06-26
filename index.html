@@ -1,469 +1,146 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-
-
   <title>丸&猴旅遊分帳</title>
-
-
-
-  <meta name="apple-mobile-web-app-capable" content="yes">
-
-  <meta name="apple-mobile-web-app-title" content="丸猴分帳">
-
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-
-
-  <meta property="og:title" content="丸&猴旅遊分帳 App">
-
-  <meta property="og:description" content="精算大師專專屬分帳系統：記錄每筆消費、收據存雲端、公式同步精算！">
-
-  <meta property="og:image" content="https://images.weserv.nl/?url=raw.githubusercontent.com/cutedonliu-droid/travel-icon/main/icon.png&w=400&h=400&fit=cover">
-
-  <meta property="og:type" content="website">
-
-
-
-  <link rel="apple-touch-icon" href="https://images.weserv.nl/?url=raw.githubusercontent.com/cutedonliu-droid/travel-icon/main/icon.png&w=180&h=180&fit=cover&output=png">
-
-  <link rel="apple-touch-icon" sizes="152x152" href="https://images.weserv.nl/?url=raw.githubusercontent.com/cutedonliu-droid/travel-icon/main/icon.png&w=152&h=152&fit=cover&output=png">
-
-  <link rel="apple-touch-icon" sizes="167x167" href="https://images.weserv.nl/?url=raw.githubusercontent.com/cutedonliu-droid/travel-icon/main/icon.png&w=167&h=167&fit=cover&output=png">
-
-  <link rel="apple-touch-icon" sizes="180x180" href="https://images.weserv.nl/?url=raw.githubusercontent.com/cutedonliu-droid/travel-icon/main/icon.png&w=180&h=180&fit=cover&output=png">
-
-  
-
-  <link rel="icon" type="image/png" sizes="32x32" href="https://images.weserv.nl/?url=raw.githubusercontent.com/cutedonliu-droid/travel-icon/main/icon.png&w=32&h=32&fit=cover&output=png">
-
-  <link rel="icon" type="image/png" sizes="192x192" href="https://images.weserv.nl/?url=raw.githubusercontent.com/cutedonliu-droid/travel-icon/main/icon.png&w=192&h=192&fit=cover&output=png">
-
-
-
   <style>
-
     :root { --primary: #4a90e2; --bg: #f5f7fa; --card: #ffffff; --text: #333333; }
-
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); margin: 0; padding: 15px; color: var(--text); padding-bottom: 40px; }
-
+    body { font-family: -apple-system, sans-serif; background-color: var(--bg); margin: 0; padding: 15px; color: var(--text); padding-bottom: 40px; }
     .app-container { max-width: 500px; margin: 0 auto; }
-
-    .summary-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: center; font-size: 14px; font-weight: bold; white-space: pre-line; line-height: 1.5; }
-
+    .summary-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: center; font-size: 14px; font-weight: bold; line-height: 1.6; }
     .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
-
     h3 { margin-top: 0; color: #444; font-size: 16px; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; }
-
     .form-group { margin-bottom: 15px; }
-
     label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #666; }
-
-    input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; background: #fafafa; transition: 0.3s; }
-
-    input:focus, select:focus { border-color: var(--primary); outline: none; background: #fff; }
-
+    input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; background: #fafafa; }
     .grid-6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-
-    .grid-btn { border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center; background: #fff; cursor: pointer; font-size: 14px; transition: 0.2s; }
-
+    .grid-btn { border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center; background: #fff; cursor: pointer; font-size: 14px; }
     .grid-btn.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: bold; }
-
     .hidden { display: none; }
-
     .file-input-wrapper { background: #eef2f7; border: 2px dashed #cbd5e1; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; position: relative; }
-
-    .file-input-wrapper input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-
-    .submit-btn { width: 100%; background: #2ecc71; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(46,204,113,0.3); transition: 0.2s; margin-bottom: 15px; }
-
-    .submit-btn:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; }
-
-    
-
-    /* 新增的試算表跳轉按鈕樣式 */
-
-    .view-sheet-btn { display: block; width: 100%; background: #7f8c8d; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; box-sizing: border-box; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
-
-    .view-sheet-btn:active { background: #95a5a6; }
-
+    .submit-btn { width: 100%; background: #2ecc71; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
   </style>
-
 </head>
-
 <body>
-
   <div class="app-container">
-
-    <div class="summary-card" id="summaryBox">📊 正在連線至試算表獲取最新對帳資訊...</div>
-
+    <div class="summary-card" id="summaryBox">📊 載入中...</div>
     <form id="expenseForm">
-
       <div class="card">
-
         <h3>1. 基本花費資訊</h3>
-
         <div class="form-group"><label>消費日期</label><input type="date" id="date" name="date" required></div>
-
         <div class="form-group">
-
           <label>消費類別</label>
-
           <div class="grid-6" id="categoryGrid">
-
             <div class="grid-btn active" data-val="食">🍕 食</div>
-
             <div class="grid-btn" data-val="衣">👕 衣</div>
-
             <div class="grid-btn" data-val="住">🏨 住</div>
-
             <div class="grid-btn" data-val="行">🚗 行</div>
-
             <div class="grid-btn" data-val="育">🎓 育</div>
-
             <div class="grid-btn" data-val="樂">🎡 樂</div>
-
           </div>
-
           <input type="hidden" id="category" name="category" value="食">
-
         </div>
-
-        <div class="form-group"><label>細項備註</label><input type="text" name="memo" placeholder="例如：華航機票、一蘭拉麵..." required></div>
-
-        
-
+        <div class="form-group"><label>細項備註</label><input type="text" name="memo" required></div>
         <div class="form-group">
-
-          <label>📸 上傳收據/發票明細（選填）</label>
-
+          <label>📸 上傳收據（選填）</label>
           <div class="file-input-wrapper">
-
-            <span id="fileLabel">點此拍照或選擇相片檔案</span>
-
-            <input type="file" id="receiptFile" accept="image/*">
-
+            <span id="fileLabel">點此選擇檔案</span>
+            <input type="file" id="receiptFile" accept="image/*" style="position:absolute;left:0;top:0;opacity:0;width:100%;height:100%">
           </div>
-
         </div>
-
       </div>
-
-
-
       <div class="card">
-
         <h3>2. 金額與支付方式</h3>
-
         <div class="form-group" style="display: flex; gap: 10px;">
-
-          <div style="flex: 1;">
-
-            <label>幣別</label>
-
-            <select name="currency" id="currency">
-
-              <option value="台幣">TWD 新台幣</option>
-
-              <option value="日幣">JPY 日本円</option>
-
-              <option value="歐元">EUR 歐元</option>
-
-              <option value="美金">USD 美金</option>
-
-            </select>
-
-          </div>
-
-          <div style="flex: 2;"><label>消費金額 (手寫填入原始金額)</label><input type="number" name="amount" step="any" required></div>
-
+          <div style="flex: 1;"><label>幣別</label><select name="currency" id="currency"><option value="台幣">TWD</option><option value="日幣">JPY</option><option value="歐元">EUR</option></select></div>
+          <div style="flex: 2;"><label>金額</label><input type="number" name="amount" step="any" required></div>
         </div>
-
-        <div class="form-group">
-
-          <label>付款方式</label>
-
-          <select name="payMethod">
-
-            <option value="現金">💵 現金支付</option>
-
-            <option value="信用卡">💳 信用卡刷卡</option>
-
-          </select>
-
-        </div>
-
+        <div class="form-group"><label>付款方式</label><select name="payMethod"><option value="現金">💵 現金</option><option value="信用卡">💳 信用卡</option></select></div>
       </div>
-
-
-
       <div class="card">
-
-        <h3>3. 精算分帳分流</h3>
-
+        <h3>3. 分帳分流</h3>
         <div class="form-group">
-
           <label>分帳方式</label>
-
-          <select name="splitType" id="splitType" onchange="toggleCustomSplit()">
-
-            <option value="兩人平均">👥 兩人平均平分</option>
-
-            <option value="丸子全付">👩 丸子要付的錢 (幫丸子代墊)</option>
-
-            <option value="猴子全付">🐵 猴子要付的錢 (幫猴子代墊)</option>
-
-            <option value="各自輸入特定金額/比例">✏️ 各自輸入特定金額/比例</option>
-
+          <select name="splitType" id="splitType" onchange="toggleCustom()">
+            <option value="兩人平均">👥 兩人平均</option>
+            <option value="丸子全付">👩 丸子全付</option>
+            <option value="猴子全付">🐵 猴子全付</option>
+            <option value="各自輸入特定金額/比例">✏️ 自訂比例</option>
           </select>
-
         </div>
-
-        <div id="customSplitSection" class="hidden" style="background: #f9f9f9; padding: 12px; border-radius: 8px; border: 1px dashed #ccc;">
-
-          <div class="form-group"><label>丸子佔多少？</label><input type="number" name="weightMaruko" id="weightMaruko" placeholder="0"></div>
-
-          <div class="form-group"><label>猴子佔多少？</label><input type="number" name="weightMonkey" id="weightMonkey" placeholder="0"></div>
-
+        <div id="customSplitSection" class="hidden">
+          <div class="form-group"><label>丸子佔多少？</label><input type="number" name="weightMaruko" value="0"></div>
+          <div class="form-group"><label>猴子佔多少？</label><input type="number" name="weightMonkey" value="0"></div>
         </div>
-
       </div>
-
       <button type="button" class="submit-btn" id="subBtn" onclick="submitForm()">🚀 記錄這筆消費</button>
-
     </form>
-
-    
-
-    <a href="https://docs.google.com/spreadsheets/d/xxxxxx/edit" target="_blank" class="view-sheet-btn" id="sheetLink">📊 查看後台試算表明細</a>
-
   </div>
 
-
-
   <script>
+    // ⚠️ 設定此頁面類型：請確保此處填寫正確 ("travel" 或 "daily")
+    const CURRENT_APP_TYPE = "travel"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzll0eEhUyEjy1VvnrD3rt1-4pZve_kN0_8le5GEwBwu_igSqktmbv006SM5lOJdtlq/exec";
 
     document.getElementById('date').valueAsDate = new Date();
-
     
-
-    // 💡 這裡放妳複製的 Google 試算表共用連結
-
-    const mySheetUrl = "https://docs.google.com/spreadsheets/d/xxxxxx/edit"; // 👈 請把雙引號內替換成妳的 Google 試算表共用連結！
-
-    document.getElementById('sheetLink').href = mySheetUrl;
-
-
-
-    document.getElementById('receiptFile').addEventListener('change', function() {
-
-      if(this.files.length > 0) {
-
-        document.getElementById('fileLabel').innerText = "🎵 已選取：" + this.files[0].name;
-
-      }
-
-    });
-
-
-
-    const buttons = document.querySelectorAll('#categoryGrid .grid-btn');
-
-    buttons.forEach(btn => {
-
-      btn.addEventListener('click', function() {
-
-        buttons.forEach(b => b.classList.remove('active'));
-
-        this.classList.add('active');
-
-        document.getElementById('category').value = this.getAttribute('data-val');
-
-      });
-
-    });
-
-
-
-    function toggleCustomSplit() {
-
+    function toggleCustom() {
       const type = document.getElementById('splitType').value;
-
-      const section = document.getElementById('customSplitSection');
-
-      section.classList.toggle('hidden', type !== '各自輸入特定金額/比例');
-
+      document.getElementById('customSplitSection').classList.toggle('hidden', type !== '各自輸入特定金額/比例');
     }
 
-
-
-    window.onload = function() {
-
-      fetch("https://script.google.com/macros/s/AKfycbzll0eEhUyEjy1VvnrD3rt1-4pZve_kN0_8le5GEwBwu_igSqktmbv006SM5lOJdtlq/exec")
-
+    function updateSummary() {
+      fetch(GAS_URL + "?type=" + CURRENT_APP_TYPE)
         .then(res => res.json())
-
         .then(data => {
-
-          document.getElementById('summaryBox').innerText = data.summary;
-
-        })
-
-        .catch(err => {
-
-          document.getElementById('summaryBox').innerText = "📊 暫時無法獲取即時對帳資訊";
-
+          document.getElementById('summaryBox').innerHTML = data.summary.replace(/\\n/g, '<br>');
         });
-
     }
 
-
+    window.onload = updateSummary;
 
     function submitForm() {
-
       const form = document.getElementById('expenseForm');
-
-      if(!form.checkValidity()) { alert("請確認欄位皆已填寫！"); return; }
-
+      if(!form.checkValidity()) { alert("請填寫完整！"); return; }
       
-
-      const subBtn = document.getElementById('subBtn');
-
-      subBtn.disabled = true;
-
-      document.getElementById('summaryBox').innerText = "⚡ 正在處理上傳照片與計算公式中...";
-
-
-
+      document.getElementById('subBtn').disabled = true;
       const fileInput = document.getElementById('receiptFile').files[0];
-
       
-
-      const formData = {
-
-        date: document.getElementById('date').value,
-
-        category: document.getElementById('category').value,
-
-        memo: form.memo.value,
-
-        currency: form.currency.value,
-
-        amount: form.amount.value,
-
-        payMethod: form.payMethod.value,
-
-        splitType: form.splitType.value,
-
-        weightMaruko: form.weightMaruko.value,
-
-        weightMonkey: form.weightMonkey.value,
-
-        fileData: null, fileName: null, fileMimeType: null
-
-      };
-
-
-
-      if (fileInput) {
-
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-
-          formData.fileData = e.target.result;
-
-          formData.fileName = fileInput.name;
-
-          formData.fileMimeType = fileInput.type;
-
-          sendToServer(formData);
-
+      const send = (fileData) => {
+        const formData = {
+          appType: CURRENT_APP_TYPE, // 自動帶入設定好的類型
+          date: form.date.value,
+          category: document.getElementById('category').value,
+          memo: form.memo.value,
+          currency: form.currency.value,
+          amount: form.amount.value,
+          payMethod: form.payMethod.value,
+          splitType: form.splitType.value,
+          weightMaruko: form.weightMaruko.value,
+          weightMonkey: form.weightMonkey.value,
+          fileData: fileData ? fileData : null,
+          fileName: fileInput ? fileInput.name : null,
+          fileMimeType: fileInput ? fileInput.type : null
         };
 
+        fetch(GAS_URL, { method: "POST", body: JSON.stringify(formData) })
+          .then(res => res.json())
+          .then(result => {
+            alert("🎉 紀錄成功！");
+            document.getElementById('subBtn').disabled = false;
+            document.getElementById('summaryBox').innerHTML = result.summary.replace(/\\n/g, '<br>');
+            form.reset();
+            document.getElementById('date').valueAsDate = new Date();
+          });
+      };
+
+      if (fileInput) {
+        const reader = new FileReader();
+        reader.onload = (e) => send(e.target.result);
         reader.readAsDataURL(fileInput);
-
-      } else {
-
-        sendToServer(formData);
-
-      }
-
+      } else { send(); }
     }
-
-
-
-    function sendToServer(formData) {
-      // 關鍵變更：加入 mode: 'no-cors'，告訴瀏覽器不要嚴格檢查回應格式
-      fetch("https://script.google.com/macros/s/AKfycbzll0eEhUyEjy1VvnrD3rt1-4pZve_kN0_8le5GEwBwu_igSqktmbv006SM5lOJdtlq/exec", {
-        method: "POST",
-        mode: "no-cors", 
-        body: JSON.stringify(formData)
-      })
-      .finally(() => {
-        // 不管回傳結果，直接視為成功，執行清理與重整
-        const subBtn = document.getElementById('subBtn');
-        subBtn.disabled = false;
-        
-        alert("🎉 紀錄已寫入！");
-        
-        // 清理介面
-        document.getElementById('receiptFile').value = "";
-        document.getElementById('fileLabel').innerText = "點此拍照或選擇相片檔案";
-        document.getElementById('expenseForm').reset();
-        document.getElementById('date').valueAsDate = new Date();
-        toggleCustomSplit();
-        
-        // 更新顯示狀態
-        document.getElementById('summaryBox').innerText = "✅ 紀錄完成，請重整以獲取最新對帳資訊";
-      });
-    }
-
-          document.getElementById('summaryBox').innerText = result.summary;
-
-          document.getElementById('receiptFile').value = "";
-
-          document.getElementById('fileLabel').innerText = "點此拍照或選擇相片檔案";
-
-          document.getElementById('expenseForm').reset();
-
-          document.getElementById('date').valueAsDate = new Date();
-
-          toggleCustomSplit();
-
-        } else { 
-
-          alert("❌ 錯誤：" + result.error); 
-
-          document.getElementById('summaryBox').innerText = "❌ 寫入失敗";
-
-        }
-
-      })
-
-      .catch(err => {
-
-        const subBtn = document.getElementById('subBtn');
-
-        subBtn.disabled = false;
-
-        alert("❌ 連線失敗：" + err);
-
-        document.getElementById('summaryBox').innerText = "❌ 連線失敗";
-
-      });
-
-    }
-
   </script>
-
 </body>
-
 </html>
