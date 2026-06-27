@@ -17,10 +17,19 @@
     .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
     .cat-btn { padding: 10px; border: 1px solid #ddd; border-radius: 8px; text-align: center; cursor: pointer; }
     .cat-btn.active { background: #4a90e2; color: white; }
+    
+    /* 新增試算表連結的樣式 */
+    .sheet-link-container { text-align: center; margin-top: -5px; margin-bottom: 15px; }
+    .sheet-link { text-decoration: none; color: #4a90e2; font-size: 14px; font-weight: bold; }
   </style>
 </head>
 <body>
   <div class="summary-card" id="summaryBox">📊 載入中...</div>
+  
+  <div class="sheet-link-container">
+    <a id="sheetLink" class="sheet-link" href="#" target="_blank" style="display: none;">🔍 點此查看完整消費清單</a>
+  </div>
+
   <form id="expenseForm">
     <div class="card">
       <h3>1. 基本花費資訊</h3>
@@ -70,7 +79,7 @@
   </form>
 
   <script>
-    // ⚠️ 這裡一定要貼上你剛剛「重新部署」產生的最新 GAS 網址！
+    // ⚠️ 這裡請保持貼上你最新的 GAS 網址！
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzll0eEhUyEjy1VvnrD3rt1-4pZve_kN0_8le5GEwBwu_igSqktmbv006SM5lOJdtlq/exec"; 
     const APP_TYPE = "travel"; 
 
@@ -103,7 +112,6 @@
         weightMonkey: form.weightMonkey.value || 0 
       };
       
-      // 簡單加上傳送中防呆，避免重複點擊
       const btn = document.querySelector('.submit-btn');
       btn.innerText = "⏳ 寫入中...";
       btn.disabled = true;
@@ -120,9 +128,17 @@
         });
     }
     
+    // 抓取資料時，同時把試算表網址 (d.url) 綁定到按鈕上
     fetch(GAS_URL + "?type=" + APP_TYPE)
       .then(r => r.json())
-      .then(d => document.getElementById('summaryBox').innerHTML = d.summary);
+      .then(d => {
+        document.getElementById('summaryBox').innerHTML = d.summary;
+        const linkElem = document.getElementById('sheetLink');
+        if(d.url) {
+          linkElem.href = d.url;
+          linkElem.style.display = 'inline-block'; // 抓到網址後把按鈕秀出來
+        }
+      });
   </script>
 </body>
 </html>
