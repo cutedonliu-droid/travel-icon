@@ -13,7 +13,7 @@
     .card { background: white; padding: 20px; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
     .summary-card { background: #667eea; color: white; padding: 20px; border-radius: 16px; text-align: center; margin-bottom: 15px; font-size: 14px; line-height: 1.6; }
     select, input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-    input[type="file"] { padding: 8px; background: #f9f9f9; }
+    input[type="file"] { padding: 8px; background: #f9f9f9; cursor: pointer; }
     .submit-btn { width: 100%; background: #2ecc71; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
     .cat-btn { padding: 10px; border: 1px solid #ddd; border-radius: 8px; text-align: center; cursor: pointer; }
@@ -43,6 +43,11 @@
       </div>
       <input type="hidden" id="category" name="category" value="食">
       <input type="text" name="memo" placeholder="細項備註" required>
+      
+      <div style="margin-top: 10px;">
+        <label for="receiptFile" style="font-size: 14px; font-weight: bold; color: #555;">📷 上傳收據 / 發票 (選填)</label>
+        <input type="file" id="receiptFile" accept="image/*" capture="environment">
+      </div>
     </div>
     
     <div class="card">
@@ -72,11 +77,6 @@
         <input type="number" name="weightMaruko" placeholder="丸子金額">
         <input type="number" name="weightMonkey" placeholder="猴子金額">
       </div>
-    </div>
-
-    <div class="card">
-      <h3>4. 上傳收據 / 明細 (選填)</h3>
-      <input type="file" id="receiptFile" accept="image/*" capture="environment">
     </div>
     
     <button type="button" class="submit-btn" onclick="submitForm()">🚀 記錄這筆消費</button>
