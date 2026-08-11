@@ -15,11 +15,13 @@
     select, input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
     input[type="file"] { padding: 8px; background: #f9f9f9; cursor: pointer; }
     .submit-btn { width: 100%; background: #2ecc71; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .submit-btn:disabled { background: #ccc; }
     .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
     .cat-btn { padding: 10px; border: 1px solid #ddd; border-radius: 8px; text-align: center; cursor: pointer; }
     .cat-btn.active { background: #4a90e2; color: white; }
     .sheet-link-container { text-align: center; margin-top: -5px; margin-bottom: 15px; }
     .sheet-link { text-decoration: none; color: #4a90e2; font-size: 14px; font-weight: bold; }
+    .field-label { font-size: 13px; font-weight: bold; color: #555; margin-top: 10px; display: block; }
   </style>
 </head>
 <body>
@@ -45,23 +47,36 @@
       <input type="text" name="memo" placeholder="細項備註" required>
       
       <div style="margin-top: 10px;">
-        <label for="receiptFile" style="font-size: 14px; font-weight: bold; color: #555;">📷 上傳收據 / 發票 (選填)</label>
+        <label for="receiptFile" class="field-label">📷 上傳收據 / 發票 (選填)</label>
         <input type="file" id="receiptFile" accept="image/*" capture="environment">
       </div>
     </div>
     
     <div class="card">
       <h3>2. 金額與支付方式</h3>
+      <label class="field-label">選擇幣別</label>
       <select name="currency">
-        <option value="台幣">🇹🇼 台幣 (TWD)</option>
         <option value="日幣">🇯🇵 日幣 (JPY)</option>
+        <option value="台幣">🇹🇼 台幣 (TWD)</option>
         <option value="美金">🇺🇸 美金 (USD)</option>
         <option value="歐元">🇪🇺 歐元 (EUR)</option>
       </select>
-      <input type="number" name="amount" placeholder="金額" required>
+      
+      <label class="field-label">消費金額</label>
+      <input type="number" step="any" name="amount" placeholder="金額" required>
+      
+      <label class="field-label">支付工具</label>
       <select name="payMethod">
         <option value="現金">💵 現金</option>
         <option value="信用卡">💳 信用卡</option>
+        <option value="交通系IC卡">📱 交通系IC卡 (Suica/ICOCA)</option>
+        <option value="PayPay">📲 PayPay / 電子支付</option>
+      </select>
+
+      <label class="field-label">誰先掏錢 (墊付人)</label>
+      <select name="paidBy">
+        <option value="猴子">🐵 猴子付的</option>
+        <option value="丸子">👩 丸子付的</option>
       </select>
     </div>
     
@@ -71,11 +86,12 @@
         <option value="兩人平均">👥 兩人平均</option>
         <option value="丸子全付">👩 丸子全付</option>
         <option value="猴子全付">🐵 猴子全付</option>
-        <option value="各自輸入特定金額/比例">✏️ 自訂比例</option>
+        <option value="按比例">✏️ 自訂金額 / 比例</option>
       </select>
-      <div id="customFields" style="display:none;">
-        <input type="number" name="weightMaruko" placeholder="丸子金額">
-        <input type="number" name="weightMonkey" placeholder="猴子金額">
+      <div id="customFields" style="display:none; margin-top: 8px;">
+        <p style="font-size: 12px; color: #888; margin: 4px 0;">💡 提示：填寫其中一方的金額，另一方會自動計算為剩餘金額</p>
+        <input type="number" step="any" name="weightMaruko" placeholder="丸子負擔金額">
+        <input type="number" step="any" name="weightMonkey" placeholder="猴子負擔金額">
       </div>
     </div>
     
@@ -83,7 +99,6 @@
   </form>
 
   <script>
-    // ⚠️ 記得貼上你「重新部署後且包含 Drive 授權」的最新 GAS 網址！
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzll0eEhUyEjy1VvnrD3rt1-4pZve_kN0_8le5GEwBwu_igSqktmbv006SM5lOJdtlq/exec"; 
     const APP_TYPE = "travel"; 
 
@@ -98,11 +113,16 @@
     
     function toggleCustom() {
       const type = document.getElementById('splitType').value;
-      document.getElementById('customFields').style.display = (type === '各自輸入特定金額/比例') ? 'block' : 'none';
+      document.getElementById('customFields').style.display = (type === '按比例' || type === '各自輸入特定金額/比例') ? 'block' : 'none';
     }
     
     function submitForm() {
       const form = document.getElementById('expenseForm');
+      if (!form.checkValidity()) {
+        alert("請填寫所有必填欄位！");
+        return;
+      }
+
       const data = { 
         appType: APP_TYPE, 
         date: form.date.value, 
@@ -111,6 +131,7 @@
         currency: form.currency.value, 
         amount: form.amount.value, 
         payMethod: form.payMethod.value, 
+        paidBy: form.paidBy.value,
         splitType: form.splitType.value, 
         weightMaruko: form.weightMaruko.value || 0, 
         weightMonkey: form.weightMonkey.value || 0 
@@ -127,8 +148,11 @@
         const reader = new FileReader();
         
         reader.onload = function(e) {
-          data.fileBase64 = e.target.result.split(',')[1];
+          const base64Str = e.target.result.split(',')[1];
+          data.fileData = base64Str;     // 傳送至 GAS 後端
+          data.fileBase64 = base64Str;   // 雙相容欄位
           data.fileName = file.name;
+          data.fileMimeType = file.type;
           data.mimeType = file.type;
           sendDataToGAS(data, btn);
         };
@@ -140,8 +164,9 @@
 
     function sendDataToGAS(data, btn) {
       fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) })
-        .then(() => { 
-          alert("紀錄成功！"); 
+        .then(r => r.json())
+        .then(res => { 
+          alert("✅ 紀錄成功！\n\n" + (res.summary ? res.summary.replace(/<br>/g, "\n").replace(/<[^>]+>/g, "") : "")); 
           location.reload(); 
         })
         .catch(err => {
@@ -151,6 +176,7 @@
         });
     }
     
+    // 頁面載入時取得上方統計摘要與試算表連結
     fetch(GAS_URL + "?type=" + APP_TYPE)
       .then(r => r.json())
       .then(d => {
