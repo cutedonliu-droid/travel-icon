@@ -55,7 +55,7 @@
     <div class="card">
       <h3>2. 金額與支付方式</h3>
       <label class="field-label">選擇幣別</label>
-     <select name="currency">
+      <select name="currency">
         <option value="JPY">🇯🇵 日幣 (JPY)</option>
         <option value="TWD">🇹🇼 台幣 (TWD)</option>
         <option value="USD">🇺🇸 美金 (USD)</option>
@@ -97,7 +97,8 @@
     
     <button type="button" class="submit-btn" onclick="submitForm()">🚀 記錄這筆消費</button>
   </form>
-   <script>
+
+  <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzll0eEhUyEjy1VvnrD3rt1-4pZve_kN0_8le5GEwBwu_igSqktmbv006SM5lOJdtlq/exec"; 
     const APP_TYPE = "travel"; 
 
@@ -175,30 +176,25 @@
         });
     }
     
-    // 載入頁面上方藍色卡片摘要
-    function loadSummary() {
-      fetch(GAS_URL + "?type=" + APP_TYPE)
-        .then(response => {
-          if (!response.ok) throw new Error("網路回應不正常");
-          return response.json();
-        })
-        .then(d => {
-          if (d && d.summary) {
-            document.getElementById('summaryBox').innerHTML = d.summary;
-          }
-          const linkElem = document.getElementById('sheetLink');
-          if (d && d.url && linkElem) {
-            linkElem.href = d.url;
-            linkElem.style.display = 'inline-block'; 
-          }
-        })
-        .catch(err => {
-          console.error("讀取摘要失敗:", err);
-          document.getElementById('summaryBox').innerHTML = "📊 數據載入中，請稍後重整";
-        });
+    // 🌟 JSONP 回呼接收：負責渲染頂部摘要與試算表連結
+    function renderSummaryData(d) {
+      if (d && d.summary) {
+        document.getElementById('summaryBox').innerHTML = d.summary;
+      }
+      const linkElem = document.getElementById('sheetLink');
+      if (d && d.url && linkElem) {
+        linkElem.href = d.url;
+        linkElem.style.display = 'inline-block'; 
+      }
     }
 
-    // 頁面開啟時自動執行
+    // 🌟 動態載入 Script 標籤，徹底解除跨域鎖定問題
+    function loadSummary() {
+      const script = document.createElement('script');
+      script.src = GAS_URL + "?type=" + APP_TYPE + "&callback=renderSummaryData";
+      document.body.appendChild(script);
+    }
+
     window.onload = loadSummary;
   </script>
 </body>
